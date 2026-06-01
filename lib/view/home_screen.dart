@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:q_dev_app/view/answer_screen.dart';
+import 'package:q_dev_app/view/search_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -152,14 +153,17 @@ class Header extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10,),
-            Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF4A90E2),
-                borderRadius: BorderRadius.circular(5)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(7.5),
-                child: Icon(Icons.search, color: Colors.white,),
+            GestureDetector(
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => SearchScreen(),)),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xFF4A90E2),
+                  borderRadius: BorderRadius.circular(5)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(7.5),
+                  child: Icon(Icons.search, color: Colors.white,),
+                ),
               ),
             )
           ],

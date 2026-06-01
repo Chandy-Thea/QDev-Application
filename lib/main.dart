@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:q_dev_app/view/home_screen.dart';
 import 'package:q_dev_app/view/login_screen.dart';
 import 'package:q_dev_app/view/register_screen.dart';
+import 'package:q_dev_app/view/search_screen.dart';
 import 'package:q_dev_app/view/tabs_screen.dart';
 
 void main() {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: TabsScreen()
+      home: SearchScreen()
     );
   }
 }
