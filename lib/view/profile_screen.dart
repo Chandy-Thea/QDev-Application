@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:q_dev_app/view/edit_profile_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -99,31 +100,35 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25)
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque, //Use this to get the whole raw tappable
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => EditProfileScreen(),)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25)
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(Icons.person_2_outlined),
+                                ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(Icons.person_2_outlined),
-                              ),
-                            ),
-                            SizedBox(width: 15,),
-                            Text('Edit Profile', style: GoogleFonts.ubuntu(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white
-                            ),)
-                          ],
-                        ),
-                        Icon(Icons.arrow_forward_ios_outlined, size: 17, color: Colors.white,)
-                      ],
+                              SizedBox(width: 15,),
+                              Text('Edit Profile', style: GoogleFonts.ubuntu(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white
+                              ),)
+                            ],
+                          ),
+                          Icon(Icons.arrow_forward_ios_outlined, size: 17, color: Colors.white,)
+                        ],
+                      ),
                     ),
                   ),
                   Divider(color: Colors.white, thickness: 1.2,),

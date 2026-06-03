@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:q_dev_app/view/login_screen.dart';
+import 'package:q_dev_app/view/tabs_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -40,18 +41,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 10,),
             MyTextField(controller: passwordController, label: '**************', header: 'Password'),
             Spacer(flex: 1,),
-            Container(
-              height: 50,
-              decoration: BoxDecoration(
-                color: Color(0xFF4A90E2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text('Sign up', style: GoogleFonts.ubuntu(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white
-                ),),
+            GestureDetector(
+              onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder:(context) => TabsScreen(),)),
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Color(0xFF4A90E2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text('Sign up', style: GoogleFonts.ubuntu(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                  ),),
+                ),
               ),
             ),
             Spacer(flex: 1,),
