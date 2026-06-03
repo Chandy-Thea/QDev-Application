@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -9,7 +11,6 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,17 +119,25 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
-class MySearchBar extends StatelessWidget {
+class MySearchBar extends StatefulWidget {
   final String title;
   const MySearchBar({super.key, required this.title});
+
+  @override
+  State<MySearchBar> createState() => _MySearchBarState();
+}
+
+class _MySearchBarState extends State<MySearchBar> {
+  TextEditingController searchController = TextEditingController();
+  bool onSearch = false;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(right: 16),
+        padding: const EdgeInsets.only(right: 10),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             BackButton(color: Colors.white,),
@@ -141,7 +150,24 @@ class MySearchBar extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12),
                   child: TextField(
-                    controller: searchComtroller,
+                    controller: searchController,
+                    onChanged: (value) {
+                      // Handle flexible icon when user on search
+                      if(value.isNotEmpty){
+                        // Not update again and again when user already on search
+                        if(!onSearch){
+                          setState(() {
+                            onSearch = true;
+                            print(onSearch);
+                          });
+                        }
+                      }else {
+                        setState(() {
+                          onSearch = false;
+                        });
+                        print(onSearch);
+                      }
+                    },
                     style: GoogleFonts.ubuntu(
                       fontSize: 17,
                       fontWeight: FontWeight.w400,
@@ -149,7 +175,7 @@ class MySearchBar extends StatelessWidget {
                     ),
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: title,
+                      hintText: widget.title,
                       hintStyle: GoogleFonts.ubuntu(
                         fontSize: 17,
                         fontWeight: FontWeight.w400,
@@ -161,16 +187,16 @@ class MySearchBar extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 16,),
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(width: 2, color: Color(0xFF8FC3FF))
-              ),
-              child: Icon(Icons.notifications_none_outlined, color: Colors.white,),
-            )
+            // Flexible search button
+            onSearch ? SizedBox(width: 10,) : SizedBox(width: 6,),
+            onSearch ? GestureDetector(
+              //onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => SearchResultScreen(),)),
+              child: Text('Search', style: GoogleFonts.ubuntu(
+                fontSize: 17,
+                fontWeight: FontWeight.w400,
+                color: Colors.white
+              ),),
+            ) : SizedBox()
           ],
         ),
       ),
