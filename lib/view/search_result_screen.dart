@@ -1,17 +1,10 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:q_dev_app/view/search_result_screen.dart';
+import 'package:q_dev_app/view/answer_screen.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class SearchResultScreen extends StatelessWidget {
+  const SearchResultScreen({super.key});
 
-  @override
-  State<SearchScreen> createState() => _SearchScreenState();
-}
-
-class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,94 +21,23 @@ class _SearchScreenState extends State<SearchScreen> {
               background: MySearchBar(title: 'Search'),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-                  child: Text('Search history',style: GoogleFonts.ubuntu(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black
-                  ),),
-                ),
-                Divider(height: 0,thickness: 1.5,)
-              ],
-            )
-          ),
           SliverList.builder(
-            itemCount: 4,
+            itemCount: 7,
             itemBuilder: (context, index){
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.alarm),
-                            SizedBox(width: 10,),
-                            Text('Mobile legend bang bang',style: GoogleFonts.ubuntu(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black
-                            ),),
-                          ],
-                        ),
-                        Icon(Icons.close)
-                      ],
+              return GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+                      child: QuestionBox(name: 'Marshmello', quesText: 'What is the difference between Computer Science and Information Technology and Why?', likeNum: 10, answerNum: 3, time: '4h', imageUrl: 'assets/images/logo.jpg'),
                     ),
-                  ),
-                  Divider(height: 0,thickness: 1.5,)
-                ],
-              );
-            }
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-                  child: Text('Suggested Searches',style: GoogleFonts.ubuntu(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black
-                  ),),
+                    SizedBox(height: 10,),
+                    Divider(height: 0, thickness: 1.5,)
+                  ],
                 ),
-                Divider(height: 0,thickness: 1.5,)
-              ],
-            )
-          ),
-          SliverList.builder(
-            itemCount: 5,
-            itemBuilder: (context, index){
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search),
-                        SizedBox(width: 10,),
-                        Text('General Knowledge',style: GoogleFonts.ubuntu(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black
-                        ),),
-                      ],
-                    ),
-                  ),
-                  Divider(height: 0,thickness: 1.5,)
-                ],
               );
-            }
-          ),
+          }),
         ],
       ),
     );
@@ -193,7 +115,9 @@ class _MySearchBarState extends State<MySearchBar> {
             // Flexible search button
             onSearch ? SizedBox(width: 10,) : SizedBox(width: 6,),
             onSearch ? GestureDetector(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => SearchResultScreen(),)),
+              onTap: () {
+                // Reload data
+              },
               child: Text('Search', style: GoogleFonts.ubuntu(
                 fontSize: 17,
                 fontWeight: FontWeight.w400,
@@ -203,6 +127,86 @@ class _MySearchBarState extends State<MySearchBar> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class QuestionBox extends StatelessWidget {
+  final String imageUrl;
+  final String name;
+  final String quesText;
+  final int likeNum;
+  final int answerNum;
+  final String time;
+  const QuestionBox({super.key, required this.name, required this.quesText, required this.likeNum, required this.answerNum, required this.time, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: Image.asset(imageUrl, width: 30, height: 30,)
+                ),
+                SizedBox(width: 7,),
+                Text(name, style: GoogleFonts.ubuntu(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400
+                ),)
+              ],
+            ),
+            Text('$time ago', style: GoogleFonts.ubuntu(
+              fontSize: 15,
+              fontWeight: FontWeight.w400
+            ),)
+          ],
+        ),
+        Text(quesText,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 2,
+        style: GoogleFonts.ubuntu(
+          fontSize: 17, 
+          fontWeight: FontWeight.w500
+        ),),
+        SizedBox(height: 4,),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.thumb_up_outlined,),
+                SizedBox(width: 3,),
+                Text('$likeNum Likes', style: GoogleFonts.ubuntu(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400
+                ),),
+                SizedBox(width: 20,),
+                Icon(Icons.comment_outlined,),
+                SizedBox(width: 3,),
+                Text('$answerNum answer', style: GoogleFonts.ubuntu(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400
+                ),),
+              ],
+            ),
+            Row(
+              children: [
+                Text('View ques', style: GoogleFonts.ubuntu(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400
+                ),),
+                SizedBox(width: 5,),
+                Icon(Icons.arrow_forward_rounded, size: 20,)
+              ],
+            )
+          ],
+        ),
+      ],
     );
   }
 }
