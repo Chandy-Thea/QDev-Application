@@ -18,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
+          backgroundColor: Color(0xFFF0F7FF),
           expandedHeight: 60,
           toolbarHeight: 60,
           pinned: true,

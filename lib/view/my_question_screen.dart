@@ -201,36 +201,13 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
               child: Container(
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                 decoration: BoxDecoration(
-                  color: Color(0xFFDFE4E9),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(width: 1.5, color: Color(0xFFBCBCBC))
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 13),
+                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(25),
-                                child: Image.asset('assets/images/logo.jpg', width: 30, height: 30,)
-                              ),
-                              SizedBox(width: 7,),
-                              Text('Marshmello', style: GoogleFonts.ubuntu(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400
-                              ),)
-                            ],
-                          ),
-                          Text('4h ago', style: GoogleFonts.ubuntu(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400
-                          ),)
-                        ],
-                      ),
                       Text('What is the difference between Computer Science and Information Technology and Why?',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -244,23 +221,6 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.thumb_up_outlined,),
-                              SizedBox(width: 3,),
-                              Text('10 Likes', style: GoogleFonts.ubuntu(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400
-                              ),),
-                              SizedBox(width: 20,),
-                              Icon(Icons.comment_outlined,),
-                              SizedBox(width: 3,),
-                              Text('3 answer', style: GoogleFonts.ubuntu(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400
-                              ),),
-                            ],
-                          ),
-                          Row(
-                            children: [
                               Text('View ques', style: GoogleFonts.ubuntu(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400
@@ -268,7 +228,11 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
                               SizedBox(width: 5,),
                               Icon(Icons.arrow_forward_rounded, size: 20,)
                             ],
-                          )
+                          ),
+                          Text('4h ago', style: GoogleFonts.ubuntu(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400
+                          ),),
                         ],
                       ),
                     ],
