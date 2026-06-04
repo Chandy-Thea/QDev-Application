@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController aboutMeController = TextEditingController();
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  TextEditingController currentPassController = TextEditingController();
+  TextEditingController newPassController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,52 +20,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         backgroundColor: Colors.blue,
         leading: BackButton(color: Colors.white,),
         centerTitle: true,
-        title: Text('Edit Profile', style: GoogleFonts.ubuntu(
+        title: Text('Change Password', style: GoogleFonts.ubuntu(
           fontWeight: FontWeight.w400,
           color: Colors.white
         ),),
       ),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 18,),
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(200),
-                  child: Image.asset('assets/images/logo.jpg', width: 120, height: 120,)
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(150, 0, 0, 0),
-                      borderRadius: BorderRadius.circular(100)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Icon(Icons.photo_camera_outlined, color: Colors.white,),
-                    ),
-                  )
-                )
-              ],
-            ),
-            SizedBox(height: 28,),
-            Divider(height: 0, thickness: 1.5,),
-            SizedBox(height: 18,),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: MyTextField(controller: nameController, label: 'Marshmello', header: 'Full name', maxLine: 1,),
-            ),
-            SizedBox(height: 12,),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: MyTextField(controller: aboutMeController, label: 'Something about you...', header: 'About me', maxLine: 4,),
-            ),
-            SizedBox(height: 18,)
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Column(
+            children: [
+              SizedBox(height: 16,),
+              Text('To change your password, ensure your new password is at least 8 characters '
+              'long to meet our security standards.', style: GoogleFonts.ubuntu(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF595959)
+              ),),
+              SizedBox(height: 16,),
+              MyTextField(controller: currentPassController, label: '**************', header: 'Current Password', maxLine: 1),
+              SizedBox(height: 10,),
+              MyTextField(controller: newPassController, label: '**************', header: 'New Password', maxLine: 1),
+            ],
+          ),
         )
       ),
       floatingActionButton: Padding(

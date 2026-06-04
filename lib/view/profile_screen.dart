@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:q_dev_app/view/change_password_screen.dart';
 import 'package:q_dev_app/view/edit_profile_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -134,31 +135,35 @@ class ProfileScreen extends StatelessWidget {
                   Divider(color: Colors.white, thickness: 1.2,),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25)
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque, //Use this to get the whole raw tappable
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => ChangePasswordScreen(),)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25)
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(Icons.lock_outline_rounded),
+                                ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(Icons.lock_outline_rounded),
-                              ),
-                            ),
-                            SizedBox(width: 15,),
-                            Text('Change password', style: GoogleFonts.ubuntu(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white
-                            ),)
-                          ],
-                        ),
-                        Icon(Icons.arrow_forward_ios_outlined, size: 17, color: Colors.white,)
-                      ],
+                              SizedBox(width: 15,),
+                              Text('Change password', style: GoogleFonts.ubuntu(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white
+                              ),)
+                            ],
+                          ),
+                          Icon(Icons.arrow_forward_ios_outlined, size: 17, color: Colors.white,)
+                        ],
+                      ),
                     ),
                   ),
                   Divider(color: Colors.white, thickness: 1.2,),
