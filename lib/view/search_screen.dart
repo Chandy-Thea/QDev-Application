@@ -132,6 +132,7 @@ class MySearchBar extends StatefulWidget {
 
 class _MySearchBarState extends State<MySearchBar> {
   TextEditingController searchController = TextEditingController();
+  FocusNode searchFocusNode = FocusNode();
   bool onSearch = false;
 
   @override
@@ -153,6 +154,8 @@ class _MySearchBarState extends State<MySearchBar> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12),
                   child: TextField(
+                    focusNode: searchFocusNode,
+                    autofocus: true,
                     controller: searchController,
                     onChanged: (value) {
                       // Handle flexible icon when user on search

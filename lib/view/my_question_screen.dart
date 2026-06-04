@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:q_dev_app/view/answer_screen.dart';
+import 'package:q_dev_app/view/search_screen.dart';
 
 class MyQuestionScreen extends StatefulWidget {
   const MyQuestionScreen({super.key});
@@ -28,28 +29,33 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(width: 1.5, color: Color(0xFFFFFFFF))
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 12),
-                          child: TextField(
-                            style: GoogleFonts.ubuntu(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white
-                            ),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Search',
-                              hintStyle: GoogleFonts.ubuntu(
+                      child: GestureDetector(
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => SearchScreen(),)),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(width: 1.5, color: Color(0xFFFFFFFF))
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: TextField(
+                              readOnly: true,
+                              enabled: false,
+                              style: GoogleFonts.ubuntu(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.white
                               ),
-                              icon: Icon(Icons.search, color: Colors.white, size: 20,)
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Search',
+                                hintStyle: GoogleFonts.ubuntu(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white
+                                ),
+                                icon: Icon(Icons.search, color: Colors.white, size: 20,)
+                              ),
                             ),
                           ),
                         ),
