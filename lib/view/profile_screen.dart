@@ -169,31 +169,50 @@ class ProfileScreen extends StatelessWidget {
                   Divider(color: Colors.white, thickness: 1.2,),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25)
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque, //Use this to get the whole raw tappable
+                      onTap: (){
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              backgroundColor: Color(0xFFD9D9D9),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                child: MyDeleteAlertContent(title: 'Delete Account?', content: 'This is permanent and cannot be undone. All your data will be lost.',
+                                onTap: () {},
+                                ),
+                              ));
+                          },
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25)
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(Icons.close),
+                                ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(Icons.close),
-                              ),
-                            ),
-                            SizedBox(width: 15,),
-                            Text('Delete my account', style: GoogleFonts.ubuntu(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white
-                            ),)
-                          ],
-                        ),
-                        Icon(Icons.arrow_forward_ios_outlined, size: 17, color: Colors.white,)
-                      ],
+                              SizedBox(width: 15,),
+                              Text('Delete account', style: GoogleFonts.ubuntu(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white
+                              ),)
+                            ],
+                          ),
+                          Icon(Icons.arrow_forward_ios_outlined, size: 17, color: Colors.white,)
+                        ],
+                      ),
                     ),
                   ),
                   Divider(color: Colors.white, thickness: 1.2,),
@@ -211,6 +230,68 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MyDeleteAlertContent extends StatelessWidget {
+  final String? uid;
+  final String? noteId;
+  final String title;
+  final String content;
+  final Function onTap;
+  const MyDeleteAlertContent({super.key, required this.title, required this.content, this.uid, this.noteId, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(title, style: GoogleFonts.ubuntu(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.black
+        ),),
+        SizedBox(height: 2,),
+        Text(content, textAlign: TextAlign.center, style: GoogleFonts.ubuntu(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: Colors.black
+        ),),
+        SizedBox(height: 13,),
+        InkWell(
+          onTap: () => onTap(),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(7)
+            ),
+            child: Center(child: Text('Delete', style: GoogleFonts.ubuntu(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Colors.white
+            ),),),
+          ),
+        ),
+        SizedBox(height: 7,),
+        InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(39, 33, 149, 243),
+              borderRadius: BorderRadius.circular(7)
+            ),
+            child: Center(child: Text('Cancel', style: GoogleFonts.ubuntu(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Colors.blue
+            ),),),
+          ),
+        ),
+      ],
     );
   }
 }
