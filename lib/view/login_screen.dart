@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:q_dev_app/view/forgot_password_screen.dart';
 import 'package:q_dev_app/view/tabs_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -40,9 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
-                onTap: () {
-                  //
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => ForgotPasswordScreen(),)),
                 child: Text('Forgot password?', style: GoogleFonts.ubuntu(
                   fontSize: 12,
                   fontWeight: FontWeight.w500
