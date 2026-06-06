@@ -1,21 +1,17 @@
 class UserModel {
   final int id;
   final String name;
+  final String email;
   // Nullable data
-  final String? email;
   final String? aboutMe;
   final String? profileUrl;
-  final int? questionsCount;
-  final int? answersCount;
 
   UserModel({
     required this.id,
     required this.name,
-    this.email,
+    required this.email,
     this.aboutMe,
     this.profileUrl,
-    this.questionsCount,
-    this.answersCount,
   });
 
   // Convert data from json, We use return (After convert to user class, it also reuturn them into list)
@@ -23,11 +19,9 @@ class UserModel {
     return UserModel(
       id: json['id'],
       name: json['name'],
-      email: json['email'], 
+      email: json['email'] ?? '', // Safeguards against any parsing errors
       aboutMe: json['about_me'],
       profileUrl: json['profile_url'],
-      questionsCount: json['questions_count'],
-      answersCount: json['answers_count'],
     );
   }
 }
