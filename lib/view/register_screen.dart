@@ -1,5 +1,8 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:q_dev_app/repository/user_repo.dart';
 import 'package:q_dev_app/view/login_screen.dart';
 import 'package:q_dev_app/view/tabs_screen.dart';
 
@@ -42,7 +45,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             MyTextField(controller: passwordController, label: '**************', header: 'Password'),
             Spacer(flex: 1,),
             GestureDetector(
-              onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder:(context) => TabsScreen(),)),
+              onTap: () async {
+                final bool succcess = await UserRepo().register(nameController.text, emailController.text, passwordController.text, passwordController.text);
+                // Check if success and we'll fetch user info
+                if(succcess){
+                  print(succcess);
+                } else {
+                  print(succcess);
+                }
+              },
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(
