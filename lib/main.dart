@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/edit_profile_screen.dart';
 import 'package:q_dev_app/view/forgot_password_screen.dart';
 import 'package:q_dev_app/view/home_screen.dart';
@@ -7,9 +8,13 @@ import 'package:q_dev_app/view/profile_screen.dart';
 import 'package:q_dev_app/view/register_screen.dart';
 import 'package:q_dev_app/view/search_screen.dart';
 import 'package:q_dev_app/view/tabs_screen.dart';
+import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp( ChangeNotifierProvider(
+    create:(context) => UserViewmodel(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

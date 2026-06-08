@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/repository/user_repo.dart';
 import 'package:q_dev_app/view/login_screen.dart';
 import 'package:q_dev_app/view/tabs_screen.dart';
+import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final userVM = Provider.of<UserViewmodel>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFFF0F7FF),
@@ -49,9 +52,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 final bool succcess = await UserRepo().register(nameController.text, emailController.text, passwordController.text, passwordController.text);
                 // Check if success and we'll fetch user info
                 if(succcess){
-                  print(succcess);
+                  await userVM.fetchUser();
+                  if(!mounted) return;
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const TabsScreen()),
+                      (route) => false, // This removes all previous screens from the memory stack
+                    );
                 } else {
-                  print(succcess);
+                  //Give error message to user
+                  print('Failed register!!!');
                 }
               },
               child: Container(

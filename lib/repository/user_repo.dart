@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserRepo {
-  final baseUrl = 'http://10.1.123.174:8000/api';
+  final baseUrl = 'http://192.168.1.15:8000/api';
   final storage = FlutterSecureStorage();
 
   Future<bool> register(String fullName, String email, String password, String confirmPassword) async {
@@ -30,6 +30,30 @@ class UserRepo {
     }else {
       print("Validation Errors from Server: ${response.body}");
       return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserInfo() async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+    final response = await http.get(Uri.parse('$baseUrl/user/profile'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    });
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      final Map<String, dynamic> data = json.decode(response.body)['data'];
+      return data;
+    }else {
+      //Check if Token is dead
+      if (response.statusCode == 401) {
+        await storage.delete(key: 'auth_token');
+      }
+      print("Validation Errors from Server: ${response.body}");
+      return null;
     }
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/change_password_screen.dart';
 import 'package:q_dev_app/view/edit_profile_screen.dart';
+import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -13,73 +15,85 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFF71B3FF),
-                borderRadius: BorderRadius.circular(16)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 17),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
-                      child: Image.asset('assets/images/logo.jpg', width: 90, height: 90,),
+            //Use Consumer whenever data changing inside viewModel and it'll only build these specific area
+            Consumer<UserViewmodel>(
+              builder: (context, viewModel, child){
+                final user = viewModel.user;
+                return Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF71B3FF),
+                    borderRadius: BorderRadius.circular(16)
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 17),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          // We'll update soon
+                          child: Image.asset('assets/images/logo.jpg', width: 90, height: 90,),
+                        ),
+                        Text(user?.name ?? 'Loading...', maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.ubuntu(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500
+                        ),),
+                        Text(user?.email ?? 'Loading...', maxLines: 1, overflow: TextOverflow.ellipsis, 
+                        style: GoogleFonts.ubuntu(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400
+                        ),)
+                      ],
                     ),
-                    Text('Marshemllo', style: GoogleFonts.ubuntu(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500
-                    ),),
-                    Text('realtheachandy@gmail.com', style: GoogleFonts.ubuntu(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400
-                    ),)
-                  ],
-                ),
-              ),
+                  ),
+                );
+              }
             ),
             SizedBox(height: 17,),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFF71B3FF),
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 15, right: 14, bottom: 15, top: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('About me', style: GoogleFonts.ubuntu(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500
-                    ),),
-                    SizedBox(height: 6,),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFBCDBFF),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(width: 1.5, color: Color(0xFFF5F5F5))
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(7, 5, 3, 5),
-                        child: Text('30% coffee, 70% unanswered emails. I’m basically a urban legend: '
-                        'occasionally spotted in the wild at 2 AM near a snack aisle, but mostly just '
-                        'a series of funny Slack messages. If found, please return to the nearest quiet library.',
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.ubuntu(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400
+            Consumer<UserViewmodel>(
+              builder: (context, viewModel, child){
+                final user = viewModel.user;
+                return Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF71B3FF),
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15, right: 14, bottom: 15, top: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('About me', style: GoogleFonts.ubuntu(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w500
                         ),),
-                      ),
-                    )
-                  ],
-                ),
-              ),
+                        SizedBox(height: 6,),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFBCDBFF),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(width: 1.5, color: Color(0xFFF5F5F5))
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(7, 5, 3, 5),
+                            child: Text(user?.aboutMe ?? 'Descript your anything about you here.',
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.ubuntu(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400
+                            ),),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              }
             ),
             SizedBox(height: 17,),
             Container(
