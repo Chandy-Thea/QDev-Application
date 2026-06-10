@@ -36,6 +36,7 @@ class UserRepo {
   Future<Map<String, dynamic>?> getUserInfo() async {
     final String? bearerToken = await storage.read(key: 'auth_token');
     print(bearerToken);
+
     final response = await http.get(Uri.parse('$baseUrl/user/profile'),
     headers: {
       'Content-Type': 'application/json',
@@ -52,6 +53,32 @@ class UserRepo {
       if (response.statusCode == 401) {
         await storage.delete(key: 'auth_token');
       }
+      print("Validation Errors from Server: ${response.body}");
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> userEditProfile(String name, String aboutMe) async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+
+    final response = await http.post(Uri.parse('$baseUrl/user/profile'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    },
+    body: json.encode({
+      'profile_file': null,
+      'name': name,
+      'about_me': aboutMe
+    }),);
+
+    print(response.statusCode);
+    if( response.statusCode == 200){
+      final Map<String, dynamic> data = json.decode(response.body)['data'];
+      return data;
+    }else {
       print("Validation Errors from Server: ${response.body}");
       return null;
     }

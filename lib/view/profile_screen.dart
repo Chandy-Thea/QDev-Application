@@ -80,7 +80,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(7, 5, 3, 5),
-                            child: Text(user?.aboutMe ?? 'Descript your anything about you here.',
+                            child: Text(user?.aboutMe ?? 'Descript anything about you here.',
                             maxLines: 4,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.ubuntu(
