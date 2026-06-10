@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -14,6 +16,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userVM = Provider.of<UserViewmodel>(context);
     return Scaffold(
       backgroundColor: Color(0xFFF0F7FF),
       appBar: AppBar(
@@ -47,19 +50,35 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 20),
-        child: Container(
-          width: double.infinity,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.blue,
-            borderRadius: BorderRadius.circular(9)
-          ),
-          child: Center(
-            child: Text('Save', style: GoogleFonts.ubuntu(
-              fontSize: 18,
-              fontWeight: FontWeight.w400,
-              color: Colors.white
-            ),),
+        child: GestureDetector(
+          onTap: () async {
+            bool status = await userVM.changePassword(currentPassController.text, newPassController.text);
+
+            if (!context.mounted) return;
+            print(status);
+            if(status == true) {
+              // Add success message to user here
+              Navigator.pop(context);
+            } else {
+              // Add error message to user
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(9)
+            ),
+            child: Center(
+              child: userVM.isLoading ?
+              CircularProgressIndicator(color: Colors.white,) : 
+              Text('Save', style: GoogleFonts.ubuntu(
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+                color: Colors.white
+              ),),
+            ),
           ),
         ),
       ),

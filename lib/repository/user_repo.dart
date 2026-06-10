@@ -83,4 +83,29 @@ class UserRepo {
       return null;
     }
   }
+
+  Future<bool> changePassword(String currentPassword, String newPassword) async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+
+    final response = await http.post(Uri.parse('$baseUrl/user/update-password'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    },
+    body: json.encode({
+      'current_password': currentPassword,
+      'new_password': newPassword,
+      'new_password_confirmation': newPassword
+    }),);
+
+    print(response.statusCode);
+    if( response.statusCode == 200){
+      return true;
+    }else {
+      print("Validation Errors from Server: ${response.body}");
+      return false;
+    }
+  }
 }
