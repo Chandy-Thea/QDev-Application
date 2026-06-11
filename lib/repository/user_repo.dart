@@ -33,6 +33,28 @@ class UserRepo {
     }
   }
 
+  Future<bool> login(String email, String password) async {
+    final response = await http.post(Uri.parse('$baseUrl/login'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: json.encode({
+      'email': email,
+      'password': password,
+    }));
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      String token = json.decode(response.body)['token'];
+      await storage.write(key: 'auth_token', value: token); //Store token in storage
+      return true;
+    }else {
+      print("Validation Errors from Server: ${response.body}");
+      return false;
+    }
+  }
+
   Future<Map<String, dynamic>?> getUserInfo() async {
     final String? bearerToken = await storage.read(key: 'auth_token');
     print(bearerToken);

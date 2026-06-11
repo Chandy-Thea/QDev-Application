@@ -49,11 +49,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Spacer(flex: 1,),
             GestureDetector(
               onTap: () async {
-                final bool succcess = await UserRepo().register(nameController.text, emailController.text, passwordController.text, passwordController.text);
+                final bool succcess = await userVM.register(nameController.text, emailController.text, passwordController.text, passwordController.text);
                 // Check if success and we'll fetch user info
                 if(succcess){
                   await userVM.fetchUser();
-                  if(!mounted) return;
+                  if(!context.mounted) return;
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (context) => const TabsScreen()),
@@ -71,7 +71,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
-                  child: Text('Sign up', style: GoogleFonts.ubuntu(
+                  child: userVM.isLoading ? 
+                  CircularProgressIndicator(color: Colors.white,) : 
+                  Text('Sign in', style: GoogleFonts.ubuntu(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white

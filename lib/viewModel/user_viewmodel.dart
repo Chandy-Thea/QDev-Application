@@ -16,6 +16,54 @@ class UserViewmodel extends ChangeNotifier {
   String? get successMessage => _successMessage;
   UserModel? get user => _user; // Store user info
 
+  Future<bool> register(String fullName, String email, String password, String confirmPassword) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final bool status = await _userRepo.register(fullName, email, password, confirmPassword);
+      
+      if (status == true) {
+        return status;
+      } else {
+      // Catch the error and turn it into a user-friendly message
+        _errorMessage = "Something weng wrong!!";
+        return status;
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to change password: ${e.toString()}";
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> login(String email, String password) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final bool status = await _userRepo.login(email, password);
+      
+      if (status == true) {
+        return status;
+      } else {
+      // Catch the error and turn it into a user-friendly message
+        _errorMessage = "Something weng wrong!!";
+        return status;
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to change password: ${e.toString()}";
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchUser() async {
     _isLoading = true;
     _errorMessage = null;
