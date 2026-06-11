@@ -55,9 +55,42 @@ class UserRepo {
     }
   }
 
+  Future<bool> logout() async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return false;
+    }
+
+    final response = await http.post(Uri.parse('$baseUrl/logout'),
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    });
+
+    print(response.statusCode);
+    if(response.statusCode == 204){
+      //Laravel'll delete token in database and wrapper'll detect again 
+      await storage.delete(key: 'auth_token');
+      return true;
+    }else {
+      //Check if Token is dead
+      if (response.statusCode == 401) {
+        await storage.delete(key: 'auth_token');
+      }
+      print("Validation Errors from Server: ${response.body}");
+      return false;
+    }
+  }
+
   Future<Map<String, dynamic>?> getUserInfo() async {
     final String? bearerToken = await storage.read(key: 'auth_token');
     print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return null;
+    }
 
     final response = await http.get(Uri.parse('$baseUrl/user/profile'),
     headers: {
@@ -83,6 +116,10 @@ class UserRepo {
   Future<Map<String, dynamic>?> userEditProfile(String name, String aboutMe) async {
     final String? bearerToken = await storage.read(key: 'auth_token');
     print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return null;
+    }
 
     final response = await http.post(Uri.parse('$baseUrl/user/profile'),
     headers: {

@@ -1,8 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/change_password_screen.dart';
 import 'package:q_dev_app/view/edit_profile_screen.dart';
+import 'package:q_dev_app/view/register_screen.dart';
 import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -10,6 +13,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userVM = Provider.of<UserViewmodel>(context);
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
@@ -230,13 +234,28 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   Divider(color: Colors.white, thickness: 1.2,),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15, bottom: 10),
-                    child: Text('Logout', style: GoogleFonts.ubuntu(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFFFF4444)
-                    ),),
+                  GestureDetector(
+                    onTap: () async {
+                      final bool status = await userVM.logout();
+                      if(status == true){
+                        if(!context.mounted) return;
+                        Navigator.pushAndRemoveUntil(context,
+                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                          (route) => false, // This removes all previous screens from the memory stack
+                        );
+                      }else {
+                        //Give error message to user
+                        print('Failed logout!!!');
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15, bottom: 10),
+                      child: Text('Logout', style: GoogleFonts.ubuntu(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFFF4444)
+                      ),),
+                    ),
                   )
                 ],
               ),
