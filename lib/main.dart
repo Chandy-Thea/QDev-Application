@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:q_dev_app/auth_wrapper.dart';
 import 'package:q_dev_app/view/edit_profile_screen.dart';
 import 'package:q_dev_app/view/forgot_password_screen.dart';
 import 'package:q_dev_app/view/home_screen.dart';
@@ -12,7 +13,7 @@ import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 void main() {
   runApp( ChangeNotifierProvider(
-    create:(context) => UserViewmodel(),
+    create:(context) => UserViewmodel()..fetchUser(),
     child: const MyApp(),
   ));
 }
@@ -20,7 +21,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: RegisterScreen()
+      home: AuthWrapper()
     );
   }
 }
