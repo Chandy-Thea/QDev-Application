@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -10,8 +12,10 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   TextEditingController emailController = TextEditingController();
+  String message = '';
   @override
   Widget build(BuildContext context) {
+    final userVM = Provider.of<UserViewmodel>(context);
     return Scaffold(
       backgroundColor: Color(0xFFF0F7FF),
       appBar: AppBar(
@@ -31,25 +35,43 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),),
               SizedBox(height: 16,),
               MyTextField(controller: emailController, label: 'example@gmail.com', header: 'Email Address', maxLine: 1),
+              SizedBox(height: 10,),
+              Text(message, style: GoogleFonts.ubuntu(
+                textStyle: const TextStyle(letterSpacing: .5),
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                color: message == 'We have emailed your password reset link.' ? Color(0xFF1c4e82) : Colors.red
+              ),),
             ],
           ),
         )
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 20),
-        child: Container(
-          width: double.infinity,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.blue,
-            borderRadius: BorderRadius.circular(9)
-          ),
-          child: Center(
-            child: Text('Save', style: GoogleFonts.ubuntu(
-              fontSize: 18,
-              fontWeight: FontWeight.w400,
-              color: Colors.white
-            ),),
+        child: GestureDetector(
+          onTap: () async {
+            String status = await userVM.forgotPassword(emailController.text);
+            print(status);
+            setState(() {
+              message = status;
+            });
+          },
+          child: Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(9)
+            ),
+            child: Center(
+              child: userVM.isLoading ? 
+              CircularProgressIndicator(color: Colors.white,) :
+              Text('Send reset link', style: GoogleFonts.ubuntu(
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+                color: Colors.white
+              ),),
+            ),
           ),
         ),
       ),

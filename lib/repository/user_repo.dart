@@ -196,4 +196,24 @@ class UserRepo {
       return false;
     }
   }
+
+  Future<String> forgotPassword(String email) async {
+    final response = await http.post(Uri.parse('$baseUrl/forgot-password'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }, 
+    body: json.encode({
+      'email': email
+    }));
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      String status = json.decode(response.body)['status'];
+      return status;
+    }else {
+      String message = json.decode(response.body)['message'];
+      return message;
+    }
+  }
 }

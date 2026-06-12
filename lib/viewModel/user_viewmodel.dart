@@ -179,4 +179,21 @@ class UserViewmodel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<String> forgotPassword(String email) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final String message = await _userRepo.forgotPassword(email);
+      return message;
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to change password: ${e.toString()}";
+      return _errorMessage!;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
