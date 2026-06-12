@@ -84,6 +84,35 @@ class UserRepo {
     }
   }
 
+  Future<bool> deleteAccount() async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return false;
+    }
+
+    final response = await http.delete(Uri.parse('$baseUrl/user/account'),
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    });
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      //Laravel'll delete token in database and wrapper'll detect again 
+      await storage.delete(key: 'auth_token');
+      return true;
+    }else {
+      //Check if Token is dead
+      if (response.statusCode == 401) {
+        await storage.delete(key: 'auth_token');
+      }
+      print("Validation Errors from Server: ${response.body}");
+      return false;
+    } 
+  }
+
   Future<Map<String, dynamic>?> getUserInfo() async {
     final String? bearerToken = await storage.read(key: 'auth_token');
     print(bearerToken);

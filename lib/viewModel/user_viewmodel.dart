@@ -88,6 +88,30 @@ class UserViewmodel extends ChangeNotifier {
     }
   }
 
+  Future<bool> deleteAccount() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final bool status = await _userRepo.deleteAccount();
+      
+      if (status == true) {
+        return status;
+      } else {
+      // Catch the error and turn it into a user-friendly message
+        _errorMessage = "Something weng wrong!!";
+        return status;
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to change password: ${e.toString()}";
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchUser() async {
     _isLoading = true;
     _errorMessage = null;

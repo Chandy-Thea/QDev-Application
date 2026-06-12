@@ -199,7 +199,22 @@ class ProfileScreen extends StatelessWidget {
                               content: SizedBox(
                                 width: double.maxFinite,
                                 child: MyDeleteAlertContent(title: 'Delete Account?', content: 'This is permanent and cannot be undone. All your data will be lost.',
-                                onTap: () {},
+                                onTap: () async {
+                                  final bool status = await userVM.deleteAccount();
+                                  if(status == true){
+                                    //Add success message to user
+                                    print(status);
+                                    if(!context.mounted) return;
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                                      (route) => false, // This removes all previous screens from the memory stack
+                                    );
+                                  }else {
+                                    //Add error message to user
+                                    print(userVM.errorMessage);
+                                  }
+                                },
                                 ),
                               ));
                           },
@@ -277,6 +292,7 @@ class MyDeleteAlertContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userVM = Provider.of<UserViewmodel>(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -301,11 +317,15 @@ class MyDeleteAlertContent extends StatelessWidget {
               color: Colors.blue,
               borderRadius: BorderRadius.circular(7)
             ),
-            child: Center(child: Text('Delete', style: GoogleFonts.ubuntu(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: Colors.white
-            ),),),
+            child: Center(
+              child: userVM.isLoading ?
+              CircularProgressIndicator(color: Colors.white,) :
+              Text('Delete', style: GoogleFonts.ubuntu(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Colors.white
+              ),),
+            ),
           ),
         ),
         SizedBox(height: 7,),
