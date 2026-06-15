@@ -1,4 +1,4 @@
-import 'user_model.dart'; // 📂 Imports your UserModel to handle creator profiles!
+import 'user_model.dart';
 
 class QuestionModel {
   final int id;
@@ -8,6 +8,7 @@ class QuestionModel {
   final bool isLiked;
   final UserModel? user; //Join to user model
   final List<String> tags; // Store tags
+  final DateTime createdAt;
 
   QuestionModel({
     required this.id,
@@ -17,12 +18,13 @@ class QuestionModel {
     required this.isLiked,
     this.user,
     required this.tags,
+    required this.createdAt
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
     return QuestionModel(
       id: json['id'],
-      content: json['content'],
+      content: json['question_text'],
       likesCount: json['likes_count'] ?? 0,
       answersCount: json['answers_count'] ?? 0,
       isLiked: json['is_liked'] ?? false, 
@@ -31,6 +33,9 @@ class QuestionModel {
       tags: json['tags'] != null
           ? List<String>.from(json['tags'].map((tag) => tag['name'].toString()))
           : [],
+      createdAt: json['created_at'] != null 
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
     );
   }
 }

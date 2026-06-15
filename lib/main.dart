@@ -9,13 +9,19 @@ import 'package:q_dev_app/view/profile_screen.dart';
 import 'package:q_dev_app/view/register_screen.dart';
 import 'package:q_dev_app/view/search_screen.dart';
 import 'package:q_dev_app/view/tabs_screen.dart';
+import 'package:q_dev_app/viewModel/question_viewmodel.dart';
 import 'package:q_dev_app/viewModel/user_viewmodel.dart';
 
 void main() {
-  runApp( ChangeNotifierProvider(
-    create:(context) => UserViewmodel()..fetchUser(),
-    child: const MyApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserViewmodel()..fetchUser()),
+        ChangeNotifierProvider(create: (_) => QuestionViewmodel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

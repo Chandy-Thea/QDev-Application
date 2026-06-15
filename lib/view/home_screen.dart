@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/answer_screen.dart';
 import 'package:q_dev_app/view/search_screen.dart';
+import 'package:q_dev_app/viewModel/question_viewmodel.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,10 +14,27 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+// 1. Keep HomeScreen alive (running) avoid refetch Questions
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
   PageController pageController = PageController();
+
+// 2. We also need this
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    // This runs exactly ONCE when the user navigates to this screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<QuestionViewmodel>(context, listen: false).fetchQuestions('popular');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 3. And this
+    super.build(context);
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -84,25 +104,51 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 10,)),
-        SliverList.builder(
-          itemCount: 7,
-          itemBuilder: (context, index){
-            return GestureDetector(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-                decoration: BoxDecoration(
-                  color: Color(0xFFDFE4E9),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(width: 1.5, color: Color(0xFFBCBCBC))
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 13),
-                  child: QuestionBox(name: 'Marshmello', quesText: 'What is the difference between Computer Science and Information Technology and Why?', likeNum: 10, answerNum: 3, time: '4h', imageUrl: 'assets/images/logo.jpg')
+        Consumer<QuestionViewmodel>(builder: (context, questionVM, child) {
+          // 1. Show a loading spinner while API is working
+          if (questionVM.isLoading) {
+            return SliverToBoxAdapter(child: const Center(child: CircularProgressIndicator()));
+          }
+
+          // 2. Display a friendly error banner if the backend fails
+          if (questionVM.errorMessage != null) {
+            return SliverToBoxAdapter(
+              child: Center(
+                child: Text(
+                  questionVM.errorMessage!,
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
                 ),
               ),
             );
-        }),
+          }
+
+          // 3. Fallback if the array comes back completely empty
+          if (questionVM.question == null || questionVM.question!.isEmpty) {
+            return SliverToBoxAdapter(child: const Center(child: Text('No questions found.')));
+          }
+
+          return SliverList.builder(
+            itemCount: questionVM.question!.length,
+            itemBuilder: (context, index){
+              final currentQuestion = questionVM.question![index];
+              return GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFDFE4E9),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(width: 1.5, color: Color(0xFFBCBCBC))
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 13),
+                    child: QuestionBox(name: currentQuestion.user!.name, quesText: currentQuestion.content ?? 'No content provided', 
+                    likeNum: currentQuestion.likesCount, answerNum: currentQuestion.answersCount, time: '4h', imageUrl: 'assets/images/logo.jpg')
+                  ),
+                ),
+              );
+          });
+        })
         // SliverFillRemaining(),
       ],
     );
@@ -186,6 +232,7 @@ class QuestionBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

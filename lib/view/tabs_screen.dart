@@ -14,7 +14,7 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   int currentPage = 0;
-  final page = [
+  final pages = [
     HomeScreen(),
     AllQuestionScreen(),
     MyQuestionScreen(),
@@ -25,7 +25,10 @@ class _TabsScreenState extends State<TabsScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFFF0F7FF),
-      body: page[currentPage],
+      body: IndexedStack(
+        index: currentPage,
+        children: pages,
+      ),
       bottomNavigationBar: CurvedNavigationBar(
         color: Color(0xFF4A90E2),
         backgroundColor: Colors.transparent,
