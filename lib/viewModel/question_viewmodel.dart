@@ -9,12 +9,14 @@ class QuestionViewmodel extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
   final Map<String, List<QuestionModel>> _question = {};
+  List<QuestionModel>? _myQuestion;
 
   // Getters to expose these states to the View safely
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   List<QuestionModel>? getQuestion(String filter) => _question[filter]; // For return to UI
+  List<QuestionModel>? get myQuestion => _myQuestion;
 
   Future<void> fetchQuestions(String filter) async {
     _isLoading = true;
@@ -28,6 +30,28 @@ class QuestionViewmodel extends ChangeNotifier {
       final parsedQuestions = rawList.map((jsonItem) => QuestionModel.fromJson(jsonItem)).toList();
       // Save to _question
       _question[filter] = parsedQuestions;
+    } else {
+        _errorMessage = "No question data found.";
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to load question: ${e.toString()}";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchMyQuestions() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final rawList = await _questionRepo.getMyQuestions();
+      
+      if (rawList != null) {
+      // Access to jsondata (jsonItem) then return back as QuestionModel
+      _myQuestion = rawList.map((jsonItem) => QuestionModel.fromJson(jsonItem)).toList();
     } else {
         _errorMessage = "No question data found.";
       }

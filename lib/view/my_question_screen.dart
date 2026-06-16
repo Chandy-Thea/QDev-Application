@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/answer_screen.dart';
 import 'package:q_dev_app/view/search_screen.dart';
+import 'package:q_dev_app/viewModel/question_viewmodel.dart';
 
 class MyQuestionScreen extends StatefulWidget {
   const MyQuestionScreen({super.key});
@@ -12,6 +14,16 @@ class MyQuestionScreen extends StatefulWidget {
 
 class _MyQuestionScreenState extends State<MyQuestionScreen> {
   TextEditingController quesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // This runs exactly ONCE when the user navigates to this screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<QuestionViewmodel>(context, listen: false).fetchMyQuestions();
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -199,54 +211,75 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
         SliverToBoxAdapter(
           child: Divider()
         ),
-        SliverList.builder(
-          itemCount: 7,
-          itemBuilder: (context, index){
-            return GestureDetector(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(width: 1.5, color: Color(0xFFBCBCBC))
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
-                  child: Column(
-                    children: [
-                      Text('What is the difference between Computer Science and Information Technology and Why?',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: GoogleFonts.ubuntu(
-                        fontSize: 17, 
-                        fontWeight: FontWeight.w500
-                      ),),
-                      SizedBox(height: 4,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Text('View ques', style: GoogleFonts.ubuntu(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400
-                              ),),
-                              SizedBox(width: 5,),
-                              Icon(Icons.arrow_forward_rounded, size: 20,)
-                            ],
-                          ),
-                          Text('4h ago', style: GoogleFonts.ubuntu(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400
-                          ),),
-                        ],
-                      ),
-                    ],
+        Consumer<QuestionViewmodel>(
+          builder: (context, questionVM, child) {
+            if (questionVM.isLoading) {
+              return SliverToBoxAdapter(child: const Center(child: CircularProgressIndicator()));
+            }
+            if (questionVM.errorMessage != null) {
+              return SliverToBoxAdapter(
+                child: Center(
+                  child: Text(
+                    questionVM.errorMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
                   ),
                 ),
-              ),
-            );
-        }),
+              );
+            }
+            if (questionVM.myQuestion == null || questionVM.myQuestion!.isEmpty) {
+              return SliverToBoxAdapter(child: const Center(child: Text('No questions found.')));
+            }
+            return SliverList.builder(
+            itemCount: questionVM.myQuestion!.length,
+            itemBuilder: (context, index){
+              final currentQuestions = questionVM.myQuestion![index];
+              return GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(width: 1.5, color: Color(0xFFBCBCBC))
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(currentQuestions.content ?? 'No content provided',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: GoogleFonts.ubuntu(
+                          fontSize: 17, 
+                          fontWeight: FontWeight.w500
+                        ),),
+                        SizedBox(height: 4,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Text('View ques', style: GoogleFonts.ubuntu(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w400
+                                ),),
+                                SizedBox(width: 5,),
+                                Icon(Icons.arrow_forward_rounded, size: 20,)
+                              ],
+                            ),
+                            Text('4h ago', style: GoogleFonts.ubuntu(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400
+                            ),),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+          });
+        })
       ],
     );
   }
