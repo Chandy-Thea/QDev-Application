@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/answer_screen.dart';
 import 'package:q_dev_app/view/search_screen.dart';
+import 'package:q_dev_app/viewModel/question_viewmodel.dart';
 
 class AllQuestionScreen extends StatefulWidget {
   const AllQuestionScreen({super.key});
@@ -51,40 +53,85 @@ class _AllQuestionScreenState extends State<AllQuestionScreen> {
           SliverFillRemaining(
             child: TabBarView(
               children: [
-                ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: 7,
-                  itemBuilder: (context, index){
-                    return GestureDetector(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
-                      child: MyQuestionBox(imageUrl: 'assets/images/logo.jpg', name: 'Marshmello', 
-                      time: '4', question: 'What is the difference between Computer Sience and Infomation Technology and ...?', like: 5, answer: 3)
-                    );
-                }),
-                ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: 3,
-                  itemBuilder: (context, index){
-                    return GestureDetector(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
-                      child:  MyQuestionBox(imageUrl: 'assets/images/logo.jpg', name: 'Marshmello', 
-                        time: '4', question: 'What is the difference between Computer Sience and Infomation Technology and ...?', like: 10, answer: 1)
-                    );
-                }),
-                ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: 4,
-                  itemBuilder: (context, index){
-                    return GestureDetector(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
-                      child:  MyQuestionBox(imageUrl: 'assets/images/logo.jpg', name: 'Marshmello', 
-                      time: '4', question: 'What is the difference between Computer Sience and Infomation Technology and ...?', like: 4, answer: 0)
-                    );
-                }),
+                QuestionTabContent(filter: 'popular'),
+                QuestionTabContent(filter: 'newest'),
+                QuestionTabContent(filter: 'oldest')
             ]),
           ),
         ],
       ),
+    );
+  }
+}
+
+
+class QuestionTabContent extends StatefulWidget {
+  final String filter;
+
+  const QuestionTabContent({super.key, required this.filter});
+
+  @override
+  State<QuestionTabContent> createState() => _QuestionTabContentState();
+}
+
+// Add AutomaticKeepAliveClientMixin so sliding between tabs doesn't destroy data!
+class _QuestionTabContentState extends State<QuestionTabContent> with AutomaticKeepAliveClientMixin {
+  
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    // This runs exactly ONCE when the user navigates to this screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<QuestionViewmodel>(context, listen: false).fetchQuestions(widget.filter);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Required by Mixin
+
+    return Consumer<QuestionViewmodel>(
+      builder: (context, questionVM, child) {
+        if (questionVM.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (questionVM.errorMessage != null) {
+          return Center(child: Text(questionVM.errorMessage!, style: const TextStyle(color: Colors.red)));
+        }
+
+        final categoryQuestions = questionVM.getQuestion(widget.filter);
+
+        if (categoryQuestions == null || categoryQuestions.isEmpty) {
+          return const Center(child: Text('No questions found.'));
+        }
+
+        return ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: categoryQuestions.length,
+          itemBuilder: (context, index) {
+            final currentQuestion = categoryQuestions[index];
+
+            return GestureDetector(
+              onTap: () => Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) => AnswerScreen()),
+              ),
+              child: MyQuestionBox(
+                imageUrl: currentQuestion.user?.profileUrl ?? 'assets/images/logo.jpg',
+                name: currentQuestion.user?.name ?? 'Anonymous',
+                time: '4',
+                question: currentQuestion.content ?? 'No content provided',
+                like: currentQuestion.likesCount,
+                answer: currentQuestion.answersCount,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -173,6 +220,7 @@ class MyQuestionBox extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 13),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

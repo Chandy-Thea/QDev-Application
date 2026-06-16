@@ -122,15 +122,18 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             );
           }
 
+          // Get popular question
+          final categoryQuestions = questionVM.getQuestion('popular');
+
           // 3. Fallback if the array comes back completely empty
-          if (questionVM.question == null || questionVM.question!.isEmpty) {
+          if (categoryQuestions == null || categoryQuestions.isEmpty) {
             return SliverToBoxAdapter(child: const Center(child: Text('No questions found.')));
           }
 
           return SliverList.builder(
-            itemCount: questionVM.question!.length,
+            itemCount: categoryQuestions.length,
             itemBuilder: (context, index){
-              final currentQuestion = questionVM.question![index];
+              final currentQuestion = categoryQuestions[index];
               return GestureDetector(
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
                 child: Container(
