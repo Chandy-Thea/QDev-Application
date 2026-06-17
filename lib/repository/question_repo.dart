@@ -54,4 +54,27 @@ class QuestionRepo {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>?> getAnswer(int id) async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return null;
+    }
+
+    final response = await http.get(Uri.parse('$baseUrl/questions/$id'),
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    });
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      final data = json.decode(response.body)['data'];
+      return data;
+    }else {
+      return null;
+    }
+  }
 }

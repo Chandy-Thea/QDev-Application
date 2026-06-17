@@ -234,7 +234,7 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
             itemBuilder: (context, index){
               final currentQuestions = questionVM.myQuestion![index];
               return GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(id: currentQuestions.id,),)),
                 child: Container(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                   decoration: BoxDecoration(

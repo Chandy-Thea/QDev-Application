@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             itemBuilder: (context, index){
               final currentQuestion = categoryQuestions[index];
               return GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(id: currentQuestion.id),)),
                 child: Container(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                   decoration: BoxDecoration(

@@ -26,7 +26,7 @@ class SearchResultScreen extends StatelessWidget {
             itemBuilder: (context, index){
               return GestureDetector(
                 behavior: HitTestBehavior.opaque, //Use this to get the whole raw tappable
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(),)),
+                // onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(id: ,),)),
                 child: Column(
                   children: [
                     Padding(

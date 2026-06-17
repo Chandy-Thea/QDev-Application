@@ -1,3 +1,5 @@
+import 'package:q_dev_app/model/answer_model.dart';
+
 import 'user_model.dart';
 
 class QuestionModel {
@@ -8,6 +10,7 @@ class QuestionModel {
   final bool isLiked;
   final UserModel? user; //Join to user model
   final List<String> tags; // Store tags
+  final List<AnswerModel> answers; // For answer screen
   final DateTime createdAt;
 
   QuestionModel({
@@ -18,6 +21,7 @@ class QuestionModel {
     required this.isLiked,
     this.user,
     required this.tags,
+    required this.answers,
     required this.createdAt
   });
 
@@ -32,6 +36,9 @@ class QuestionModel {
       // Loops through the tags table array and extracts just the 'name' string column
       tags: json['tags'] != null
           ? List<String>.from(json['tags'].map((tag) => tag['name'].toString()))
+          : [],
+      answers: json['answers'] != null
+          ? (json['answers'] as List).map((item) => AnswerModel.fromJson(item)).toList()
           : [],
       createdAt: json['created_at'] != null 
           ? DateTime.parse(json['created_at'])

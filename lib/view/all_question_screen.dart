@@ -118,7 +118,7 @@ class _QuestionTabContentState extends State<QuestionTabContent> with AutomaticK
             return GestureDetector(
               onTap: () => Navigator.push(
                 context, 
-                MaterialPageRoute(builder: (context) => AnswerScreen()),
+                MaterialPageRoute(builder: (context) => AnswerScreen(id: currentQuestion.id,)),
               ),
               child: MyQuestionBox(
                 imageUrl: currentQuestion.user?.profileUrl ?? 'assets/images/logo.jpg',
