@@ -1,45 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/answer_screen.dart';
+import 'package:q_dev_app/view/home_screen.dart';
+import 'package:q_dev_app/viewModel/question_viewmodel.dart';
 
 class SearchResultScreen extends StatelessWidget {
-  const SearchResultScreen({super.key});
+  final String defaultText;
+  const SearchResultScreen({super.key, required this.defaultText});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFFF0F7FF),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            toolbarHeight: 62,
-            automaticallyImplyLeading: false, 
-            backgroundColor: Colors.blue,
-            flexibleSpace: FlexibleSpaceBar(
-              background: MySearchBar(title: 'Search'),
-            ),
-          ),
-          SliverList.builder(
-            itemCount: 7,
-            itemBuilder: (context, index){
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque, //Use this to get the whole raw tappable
-                // onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => AnswerScreen(id: ,),)),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
-                      child: QuestionBox(name: 'Marshmello', quesText: 'What is the difference between Computer Science and Information Technology and Why?', likeNum: 10, answerNum: 3, time: '4h', imageUrl: 'assets/images/logo.jpg'),
-                    ),
-                    SizedBox(height: 10,),
-                    Divider(height: 0, thickness: 1.5,)
-                  ],
+      body: Consumer<QuestionViewmodel>(
+        builder: (context, questionVM, child) {
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                toolbarHeight: 62,
+                automaticallyImplyLeading: false, 
+                backgroundColor: Colors.blue,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: MySearchBar(title: 'Search', defaultText: defaultText,),
                 ),
-              );
-          }),
-        ],
+              ),
+
+              if (questionVM.isLoading)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: CircularProgressIndicator(color: Colors.blue),
+                  ),
+                )
+
+              else if (questionVM.errorMessage != null)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Text(
+                      questionVM.errorMessage!,
+                      style: TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                  ),
+                )
+
+              else if (questionVM.searchResults.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Text(
+                      'No questions match your search parameters.', 
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                )
+
+              else
+                SliverList.builder(
+                  itemCount: questionVM.searchResults.length,
+                  itemBuilder: (context, index) {
+                    final currentQuestion = questionVM.searchResults[index];
+                    
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AnswerScreen(id: currentQuestion.id),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(14, 10, 14, 0),
+                            child: QuestionBox(
+                              name: currentQuestion.user?.name ?? 'Anonymous', 
+                              quesText: currentQuestion.content ?? 'No content provided', 
+                              likeNum: currentQuestion.likesCount, 
+                              answerNum: currentQuestion.answersCount, 
+                              time: '4h', 
+                              imageUrl: 'assets/images/logo.jpg',
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Divider(height: 0, thickness: 1.5),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -47,7 +104,8 @@ class SearchResultScreen extends StatelessWidget {
 
 class MySearchBar extends StatefulWidget {
   final String title;
-  const MySearchBar({super.key, required this.title});
+  final String defaultText;
+  const MySearchBar({super.key, required this.title, required this.defaultText});
 
   @override
   State<MySearchBar> createState() => _MySearchBarState();
@@ -56,48 +114,57 @@ class MySearchBar extends StatefulWidget {
 class _MySearchBarState extends State<MySearchBar> {
   TextEditingController searchController = TextEditingController();
   bool onSearch = false;
+  // Update defualt text to search bar
+  @override
+  void initState() {
+    super.initState();
+    // ✅ Initialize the field with the search term from the previous screen
+    searchController = TextEditingController(text: widget.defaultText);
+    onSearch = widget.defaultText.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final questionVM = Provider.of<QuestionViewmodel>(context, listen: false);
+
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(right: 10),
+        padding: EdgeInsets.only(right: 10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            BackButton(color: Colors.white,),
+            BackButton(
+              onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+              color: Colors.white
+            ),
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1.5, color: Color(0xFFFFFFFF))
+                  border: Border.all(width: 1.5, color: Color(0xFFFFFFFF)),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 12),
+                  padding: EdgeInsets.only(left: 12),
                   child: TextField(
                     controller: searchController,
                     onChanged: (value) {
-                      // Handle flexible icon when user on search
-                      if(value.isNotEmpty){
-                        // Not update again and again when user already on search
-                        if(!onSearch){
+                      if (value.isNotEmpty) {
+                        if (!onSearch) {
                           setState(() {
                             onSearch = true;
-                            print(onSearch);
                           });
                         }
-                      }else {
+                      } else {
                         setState(() {
                           onSearch = false;
                         });
-                        print(onSearch);
                       }
                     },
                     style: GoogleFonts.ubuntu(
                       fontSize: 17,
                       fontWeight: FontWeight.w400,
-                      color: Colors.white
+                      color: Colors.white,
                     ),
                     decoration: InputDecoration(
                       border: InputBorder.none,
@@ -105,26 +172,29 @@ class _MySearchBarState extends State<MySearchBar> {
                       hintStyle: GoogleFonts.ubuntu(
                         fontSize: 17,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white
+                        color: Colors.white,
                       ),
-                      icon: Icon(Icons.search, color: Colors.white, size: 20,)
+                      icon: Icon(Icons.search, color: Colors.white, size: 20),
                     ),
                   ),
                 ),
               ),
             ),
-            // Flexible search button
-            onSearch ? SizedBox(width: 10,) : SizedBox(width: 6,),
-            onSearch ? GestureDetector(
-              onTap: () {
-                // Reload data
-              },
-              child: Text('Search', style: GoogleFonts.ubuntu(
-                fontSize: 17,
-                fontWeight: FontWeight.w400,
-                color: Colors.white
-              ),),
-            ) : SizedBox()
+            SizedBox(width: onSearch ? 10 : 6),
+            if (onSearch)
+              GestureDetector(
+                onTap: () async {
+                  await questionVM.searchQuery(searchController.text);
+                },
+                child: Text( 'Search', style: GoogleFonts.ubuntu(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            else
+              SizedBox()
           ],
         ),
       ),
@@ -139,11 +209,21 @@ class QuestionBox extends StatelessWidget {
   final int likeNum;
   final int answerNum;
   final String time;
-  const QuestionBox({super.key, required this.name, required this.quesText, required this.likeNum, required this.answerNum, required this.time, required this.imageUrl});
+  
+  const QuestionBox({
+    super.key, 
+    required this.name, 
+    required this.quesText, 
+    required this.likeNum, 
+    required this.answerNum, 
+    required this.time, 
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -152,57 +232,39 @@ class QuestionBox extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(25),
-                  child: Image.asset(imageUrl, width: 30, height: 30,)
+                  child: Image.asset(imageUrl, width: 30, height: 30),
                 ),
-                SizedBox(width: 7,),
-                Text(name, style: GoogleFonts.ubuntu(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400
-                ),)
+                SizedBox(width: 7),
+                Text(name, style: GoogleFonts.ubuntu(fontSize: 15, fontWeight: FontWeight.w400)),
               ],
             ),
-            Text('$time ago', style: GoogleFonts.ubuntu(
-              fontSize: 15,
-              fontWeight: FontWeight.w400
-            ),)
+            Text('$time ago', style: GoogleFonts.ubuntu(fontSize: 15, fontWeight: FontWeight.w400)),
           ],
         ),
-        Text(quesText,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 2,
-        style: GoogleFonts.ubuntu(
-          fontSize: 17, 
-          fontWeight: FontWeight.w500
-        ),),
-        SizedBox(height: 4,),
+        SizedBox(height: 6),
+        Text(quesText, overflow: TextOverflow.ellipsis, maxLines: 2, 
+          style: GoogleFonts.ubuntu(fontSize: 17, fontWeight: FontWeight.w500),
+        ),
+        SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
-                Icon(Icons.thumb_up_outlined,),
-                SizedBox(width: 3,),
-                Text('$likeNum Likes', style: GoogleFonts.ubuntu(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400
-                ),),
-                SizedBox(width: 20,),
-                Icon(Icons.comment_outlined,),
-                SizedBox(width: 3,),
-                Text('$answerNum answer', style: GoogleFonts.ubuntu(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400
-                ),),
+                Icon(Icons.thumb_up_outlined, size: 20),
+                SizedBox(width: 3),
+                Text('$likeNum Likes', style: GoogleFonts.ubuntu(fontSize: 14, fontWeight: FontWeight.w400)),
+                SizedBox(width: 20),
+                Icon(Icons.comment_outlined, size: 20),
+                SizedBox(width: 3),
+                Text('$answerNum answers', style: GoogleFonts.ubuntu(fontSize: 14, fontWeight: FontWeight.w400)),
               ],
             ),
             Row(
               children: [
-                Text('View ques', style: GoogleFonts.ubuntu(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400
-                ),),
-                SizedBox(width: 5,),
-                Icon(Icons.arrow_forward_rounded, size: 20,)
+                Text('View ques', style: GoogleFonts.ubuntu(fontSize: 14, fontWeight: FontWeight.w400)),
+                SizedBox(width: 5),
+                Icon(Icons.arrow_forward_rounded, size: 18),
               ],
             )
           ],

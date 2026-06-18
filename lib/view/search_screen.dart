@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:q_dev_app/view/search_result_screen.dart';
+import 'package:q_dev_app/viewModel/question_viewmodel.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -137,6 +139,7 @@ class _MySearchBarState extends State<MySearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final questionVM = Provider.of<QuestionViewmodel>(context);
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(right: 10),
@@ -196,7 +199,11 @@ class _MySearchBarState extends State<MySearchBar> {
             // Flexible search button
             onSearch ? SizedBox(width: 10,) : SizedBox(width: 6,),
             onSearch ? GestureDetector(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder:(context) => SearchResultScreen(),)),
+              onTap: () async {
+                Navigator.push(context, MaterialPageRoute(builder:(context) => SearchResultScreen(defaultText: searchController.text,),));
+                questionVM.searchQuery(searchController.text);
+                print(questionVM.searchResults[0].content);
+              },
               child: Text('Search', style: GoogleFonts.ubuntu(
                 fontSize: 17,
                 fontWeight: FontWeight.w400,

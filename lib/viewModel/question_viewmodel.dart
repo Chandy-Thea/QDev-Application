@@ -11,6 +11,7 @@ class QuestionViewmodel extends ChangeNotifier {
   final Map<String, List<QuestionModel>> _question = {};
   List<QuestionModel>? _myQuestion;
   QuestionModel? _selectedQuestion; //For specific question with their answers
+  List<QuestionModel> _searchResults = []; //For search
 
   // Getters to expose these states to the View safely
   bool get isLoading => _isLoading;
@@ -19,6 +20,7 @@ class QuestionViewmodel extends ChangeNotifier {
   List<QuestionModel>? getQuestion(String filter) => _question[filter]; // For return to UI
   List<QuestionModel>? get myQuestion => _myQuestion;
   QuestionModel? get selectedQuestion => _selectedQuestion;
+  List<QuestionModel> get searchResults => _searchResults;
 
   Future<void> fetchQuestions(String filter) async {
     _isLoading = true;
@@ -77,6 +79,33 @@ class QuestionViewmodel extends ChangeNotifier {
       if (map != null) {
       // Access to jsondata (jsonItem) then return back as QuestionModel
       _selectedQuestion = QuestionModel.fromJson(map);
+    } else {
+        _errorMessage = "No question data found.";
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to load question: ${e.toString()}";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> searchQuery(String query) async {
+    if (query.trim().isEmpty) {
+      _searchResults = [];
+      notifyListeners();
+      return;
+    }
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final rawList = await _questionRepo.searchQuery(query);
+      
+      if (rawList != null) {
+      // Access to jsondata (jsonItem) then return back as QuestionModel
+      _searchResults = rawList.map((map) => QuestionModel.fromJson(map)).toList();
     } else {
         _errorMessage = "No question data found.";
       }
