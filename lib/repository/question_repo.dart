@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class QuestionRepo {
-  final baseUrl = 'http://10.1.120.210:8000/api';
+  final baseUrl = 'http://192.168.1.14:8000/api';
   final storage = FlutterSecureStorage();
 
   Future<List<dynamic>?> getQuestions(String filter) async {
@@ -99,6 +99,34 @@ class QuestionRepo {
       return data;
     }else {
       return null;
+    }
+  }
+
+  Future<String?> postAnswer(int id, String answerText) async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return null;
+    }
+
+    final response = await http.post(Uri.parse('$baseUrl/questions/$id/answers'),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    },
+    body: json.encode({
+      'answer_text': answerText,
+    }));
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      final message = json.decode(response.body)['message']; // Get success message
+      return message;
+    }else {
+      final message = json.decode(response.body)['message']; // Get fail message
+      return message;
     }
   }
 }

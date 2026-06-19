@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:q_dev_app/model/question_model.dart';
 import 'package:q_dev_app/repository/question_repo.dart';
@@ -106,6 +108,31 @@ class QuestionViewmodel extends ChangeNotifier {
       if (rawList != null) {
       // Access to jsondata (jsonItem) then return back as QuestionModel
       _searchResults = rawList.map((map) => QuestionModel.fromJson(map)).toList();
+    } else {
+        _errorMessage = "No question data found.";
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to load question: ${e.toString()}";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> postAnswer(int id, String answerText) async {
+    if (answerText.trim().isEmpty) {
+      return;
+    }
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final message = await _questionRepo.postAnswer(id, answerText);
+      
+      if (message != null) {
+      // Add success or fail message to UI
+      print(message);
     } else {
         _errorMessage = "No question data found.";
       }
