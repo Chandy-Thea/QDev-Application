@@ -14,6 +14,7 @@ class QuestionViewmodel extends ChangeNotifier {
   List<QuestionModel>? _myQuestion;
   QuestionModel? _selectedQuestion; //For specific question with their answers
   List<QuestionModel> _searchResults = []; //For search
+  List<dynamic> _tags = [];
 
   // Getters to expose these states to the View safely
   bool get isLoading => _isLoading;
@@ -23,6 +24,7 @@ class QuestionViewmodel extends ChangeNotifier {
   List<QuestionModel>? get myQuestion => _myQuestion;
   QuestionModel? get selectedQuestion => _selectedQuestion;
   List<QuestionModel> get searchResults => _searchResults;
+  List<dynamic> get tags => _tags;
 
   Future<void> fetchQuestions(String filter) async {
     _isLoading = true;
@@ -133,6 +135,53 @@ class QuestionViewmodel extends ChangeNotifier {
       if (message != null) {
       // Add success or fail message to UI
       print(message);
+    } else {
+        _errorMessage = "No question data found.";
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to load question: ${e.toString()}";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> postQuestion(String questionText, List<String> tags) async {
+    if (questionText.trim().isEmpty) {
+      return;
+    }
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final message = await _questionRepo.postQuestion(questionText, tags);
+      
+      if (message != null) {
+      // Add success or fail message to UI
+      print(message);
+    } else {
+        _errorMessage = "No question data found.";
+      }
+    } catch (e) {
+      // Catch the error and turn it into a user-friendly message
+      _errorMessage = "Failed to load question: ${e.toString()}";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchTags() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final rawList = await _questionRepo.getTags();
+      
+      if (rawList != null) {
+      // Access to jsondata (jsonItem) then return back as QuestionModel
+      _tags = rawList.map((item) => item['name']).toList();
     } else {
         _errorMessage = "No question data found.";
       }

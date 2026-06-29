@@ -14,6 +14,7 @@ class MyQuestionScreen extends StatefulWidget {
 
 class _MyQuestionScreenState extends State<MyQuestionScreen> {
   TextEditingController quesController = TextEditingController();
+  List<String> selectedTags = [];
 
   @override
   void initState() {
@@ -21,11 +22,32 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
     // This runs exactly ONCE when the user navigates to this screen.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<QuestionViewmodel>(context, listen: false).fetchMyQuestions();
+      Provider.of<QuestionViewmodel>(context, listen: false).fetchTags();
     });
+  }
+
+
+  // Handle submission logic
+  void _submitQuestion(QuestionViewmodel questionVM) async {
+    final text = quesController.text.trim();
+    
+    if (text.isNotEmpty) {
+      await questionVM.postQuestion(text, selectedTags);
+      await questionVM.fetchMyQuestions();
+      await questionVM.fetchQuestions('popular');
+      
+      // Clear selections for next time
+      quesController.clear();
+      setState(() {
+        selectedTags.clear();
+      });
+      if (mounted) Navigator.pop(context);
+    }
   }
   
   @override
   Widget build(BuildContext context) {
+    final questionVM = Provider.of<QuestionViewmodel>(context);
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -114,76 +136,130 @@ class _MyQuestionScreenState extends State<MyQuestionScreen> {
                 GestureDetector(
                   onTap: () {
                     showDialog(
+                      barrierDismissible: false,
                       context: context, 
                       builder: (context){
-                        return AlertDialog(
-                          backgroundColor: Color(0xFFEBF4FF),
-                          title: Text('Create question', style: GoogleFonts.ubuntu(
-                            fontSize: 23,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF003E85)
-                          ),),
-                          shape: RoundedRectangleBorder(
-                           borderRadius: BorderRadius.circular(16),
-                          ),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                MyTextField(controller: quesController, label: 'Enter your question', header: 'Question'),
-                                SizedBox(height: 7,),
-                                Text('Add tags', style: GoogleFonts.ubuntu(
-                                  fontSize: 17, color: Colors.black
-                                )),
-                                SizedBox(height: 7,),
-                                SizedBox(
-                                  height: 40,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: 5,
-                                    itemBuilder: (context, index){
-                                      return Container(
-                                        margin: EdgeInsets.only(right: 8),
-                                        decoration: BoxDecoration(
-                                          color: Color(0xFF0076FF),
-                                          borderRadius: BorderRadius.circular(8)
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                                          child: Text('Computer Science', style: GoogleFonts.ubuntu(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.white
-                                          ),),
-                                        ),
-                                      );
-                                    }
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF4C9FFF),
-                                  borderRadius: BorderRadius.circular(6)
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                  child: Text('Create question', style: GoogleFonts.ubuntu(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.white
-                                  ),),
+                        //Add stateful, Every update in this widget will make it rebuild to get response UI
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return AlertDialog(
+                              backgroundColor: Color(0xFFEBF4FF),
+                              shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              ),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    MyTextField(controller: quesController, label: 'Enter your question', header: 'Question'),
+                                    SizedBox(height: 7,),
+                                    Text('Add tags', style: GoogleFonts.ubuntu(
+                                      fontSize: 17, color: Colors.black
+                                    )),
+                                    SizedBox(height: 7,),
+                                    SizedBox(
+                                      height: 40,
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: questionVM.tags.length,
+                                        itemBuilder: (context, index){
+                                          final nameTag = questionVM.tags[index];
+                                          return InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                //Check if already add
+                                                if(selectedTags.contains(nameTag)) {
+                                                  selectedTags.remove(nameTag);
+                                                  print('Remove');
+                                                }else {
+                                                  selectedTags.add(nameTag);
+                                                  print('Add');
+                                                }
+                                                for ( String name in selectedTags) {
+                                                  print(name);
+                                                }
+                                              });
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.only(right: 8),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(color: selectedTags.contains(nameTag) ?Colors.blue : Color(0xFFBCBCBC), width: 1.2),
+                                                borderRadius: BorderRadius.circular(8)
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                                child: Text(nameTag ?? 'Error tags.', style: GoogleFonts.ubuntu(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: selectedTags.contains(nameTag) ? Colors.blue : Colors.black
+                                                ),),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            )
-                          ],
+                              actions: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        // Clear selections for next time
+                                        quesController.clear();
+                                        setState(() {
+                                          selectedTags.clear();
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(39, 33, 149, 243),
+                                          borderRadius: BorderRadius.circular(7)
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                          child: Center(child: Text('Cancel', style: GoogleFonts.ubuntu(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.blue
+                                          ),),),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 15,),
+                                    InkWell(
+                                      onTap: () async {
+                                        _submitQuestion(questionVM);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          borderRadius: BorderRadius.circular(7)
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                                          child: Center(child: questionVM.isLoading ? CircularProgressIndicator(color: Colors.white,) :
+                                          Text('Add', style: GoogleFonts.ubuntu(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.white
+                                            ),),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            );
+                          },
                         );
                       }
                     );
@@ -313,6 +389,7 @@ class MyTextField extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(left: 16),
             child: TextField(
+              maxLines: 3,
               controller: controller,
               style: GoogleFonts.ubuntu(
                 fontSize: 17,

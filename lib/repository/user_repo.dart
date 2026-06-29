@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserRepo {
-  final baseUrl = 'http://192.168.1.14:8000/api';
+  final baseUrl = 'http://192.168.1.7:8000/api';
   final storage = FlutterSecureStorage();
 
   Future<bool> register(String fullName, String email, String password, String confirmPassword) async {

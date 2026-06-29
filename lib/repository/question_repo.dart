@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class QuestionRepo {
-  final baseUrl = 'http://192.168.1.14:8000/api';
+  final baseUrl = 'http://192.168.1.7:8000/api';
   final storage = FlutterSecureStorage();
 
   Future<List<dynamic>?> getQuestions(String filter) async {
@@ -127,6 +127,59 @@ class QuestionRepo {
     }else {
       final message = json.decode(response.body)['message']; // Get fail message
       return message;
+    }
+  }
+
+  Future<String?> postQuestion(String questionText, List<String> tags) async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return null;
+    }
+
+    final response = await http.post(Uri.parse('$baseUrl/questions'),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    },
+    body: json.encode({
+      'question_text': questionText,
+      'tags': tags
+    }));
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      final message = json.decode(response.body)['message']; // Get success message
+      return message;
+    }else {
+      final message = json.decode(response.body)['message']; // Get fail message
+      return message;
+    }
+  }
+
+  Future<List<dynamic>?> getTags() async {
+    final String? bearerToken = await storage.read(key: 'auth_token');
+    print(bearerToken);
+    if (bearerToken == null){
+      print('Bearer is null!!');
+      return null;
+    }
+
+    final response = await http.get(Uri.parse('$baseUrl/tags'),
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $bearerToken'
+    },);
+
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      // Get list of tags
+      final rawList = json.decode(response.body)['data'];
+      return rawList;
+    }else {
+      return null;
     }
   }
 }
