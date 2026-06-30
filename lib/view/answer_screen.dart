@@ -79,29 +79,33 @@ class _AnswerScreenState extends State<AnswerScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(30),
-                                  child: Image.asset('assets/images/logo.jpg', width: 45, height: 45,)
-                                ),
-                                SizedBox(width: 10,),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(questionVM.selectedQuestion!.user?.name ?? 'Anonymous', style: GoogleFonts.ubuntu(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500
-                                    ),),
-                                    Text(questionVM.selectedQuestion!.tags.map((tag) => '#$tag').join(' '), maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.ubuntu(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                      color:  Color(0xFF075594)
-                                    ),)
-                                  ],
-                                ),
-                              ],
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: Image.asset('assets/images/logo.jpg', width: 45, height: 45,)
+                                  ),
+                                  SizedBox(width: 10,),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(questionVM.selectedQuestion!.user?.name ?? 'Anonymous', style: GoogleFonts.ubuntu(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w500
+                                        ),),
+                                        Text(questionVM.selectedQuestion!.tags.map((tag) => '#$tag').join(' '), maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.ubuntu(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color:  Color(0xFF075594)
+                                        ),)
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Text('4h ago', style: GoogleFonts.ubuntu(
                               fontSize: 16,
